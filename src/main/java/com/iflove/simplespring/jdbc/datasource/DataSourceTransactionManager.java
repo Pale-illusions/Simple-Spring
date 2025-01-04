@@ -100,7 +100,6 @@ public class DataSourceTransactionManager extends AbstractPlatformTransactionMan
             txObject.setConnectionHolder(null, false);
             throw new CannotCreateTransactionException("Could not open JDBC Connection for transaction", e);
         }
-
     }
 
     @Override

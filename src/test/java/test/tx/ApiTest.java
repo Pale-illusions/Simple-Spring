@@ -76,7 +76,7 @@ public class ApiTest {
 
         JdbcService proxyCglib = (JdbcServiceImpl) new CglibAopProxy(advisedSupport).getProxy();
 
-
+        // Fixme: 事务注解失效
         proxyCglib.saveData(jdbcTemplate);
     }
 
