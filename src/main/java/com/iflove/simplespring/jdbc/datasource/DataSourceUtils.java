@@ -2,6 +2,7 @@ package com.iflove.simplespring.jdbc.datasource;
 
 import com.iflove.simplespring.jdbc.CannotGetJdbcConnectionException;
 import com.iflove.simplespring.jdbc.support.JdbcUtils;
+import com.iflove.simplespring.tx.support.TransactionSynchronizationManager;
 import com.sun.org.slf4j.internal.Logger;
 import com.sun.org.slf4j.internal.LoggerFactory;
 
@@ -24,10 +25,12 @@ public abstract class DataSourceUtils {
     }
 
     public static Connection doGetConnection(DataSource dataSource) throws SQLException {
-        Connection connection = fetchConnection(dataSource);
-        ConnectionHolder holderToUse = new ConnectionHolder(connection);
+        ConnectionHolder conHolder = (ConnectionHolder) TransactionSynchronizationManager.getResource(dataSource);
+        if (null != conHolder && conHolder.hasConnection()) {
+            return conHolder.getConnection();
+        }
 
-        return connection;
+        return fetchConnection(dataSource);
     }
 
     private static Connection fetchConnection(DataSource dataSource) throws SQLException {

@@ -77,6 +77,7 @@ public class JdbcTemplate extends JdbcAccessor implements JdbcOperations {
         } finally {
             if (closeResources) {
                 JdbcUtils.closeStatement(stmt);
+                DataSourceUtils.releaseConnection(con, getDataSource());
             }
         }
     }
