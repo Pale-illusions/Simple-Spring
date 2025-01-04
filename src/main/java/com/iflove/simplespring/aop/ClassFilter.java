@@ -17,4 +17,5 @@ public interface ClassFilter {
      */
     boolean matches(Class<?> clazz);
 
+    ClassFilter TRUE = TrueClassFilter.INSTANCE;
 }
