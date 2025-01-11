@@ -4,6 +4,7 @@ import com.iflove.simplespring.beans.BeansException;
 import com.iflove.simplespring.beans.factory.ConfigurableListableBeanFactory;
 import com.iflove.simplespring.beans.factory.config.BeanFactoryPostProcessor;
 import com.iflove.simplespring.beans.factory.config.BeanPostProcessor;
+import com.iflove.simplespring.context.ApplicationContext;
 import com.iflove.simplespring.context.ApplicationEvent;
 import com.iflove.simplespring.context.ApplicationListener;
 import com.iflove.simplespring.context.ConfigurableApplicationContext;
@@ -32,6 +33,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
     public static final String APPLICATION_EVENT_MULTICASTER_BEAN_NAME = "applicationEventMulticaster";
 
     private ApplicationEventMulticaster applicationEventMulticaster;
+
+    /** Parent context. */
+    private ApplicationContext parent;
 
     @Override
     public void refresh() throws BeansException {
@@ -163,5 +167,15 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         publishEvent(new ContextClosedEvent(this));
         // 执行单例 bean 的销毁方法
         getBeanFactory().destroySingletons();
+    }
+
+    @Override
+    public ApplicationContext getParent() {
+        return this.parent;
+    }
+
+    @Override
+    public void setParent(ApplicationContext parent) {
+        this.parent = parent;
     }
 }

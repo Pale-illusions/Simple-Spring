@@ -14,7 +14,7 @@ import java.util.Objects;
  * understood by an {@link XmlBeanDefinitionReader}.
  */
 
-public abstract class AbstractXmlApplicationContext extends AbstractRefreshableApplicationContext {
+public abstract class AbstractXmlApplicationContext extends AbstractRefreshableConfigApplicationContext {
 
     @Override
     protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) {
@@ -24,6 +24,4 @@ public abstract class AbstractXmlApplicationContext extends AbstractRefreshableA
             beanDefinitionReader.loadBeanDefinitions(configLocations);
         }
     }
-
-    protected abstract String[] getConfigLocations();
 }

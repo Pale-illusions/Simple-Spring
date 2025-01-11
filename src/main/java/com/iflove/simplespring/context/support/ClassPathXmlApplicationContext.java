@@ -7,7 +7,6 @@ package com.iflove.simplespring.context.support;
  */
 
 public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContext {
-    private String[] configLocations;
 
     public ClassPathXmlApplicationContext() {
 
@@ -28,12 +27,7 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
      * @param configLocations 配置地址
      */
     public ClassPathXmlApplicationContext(String[] configLocations) {
-        this.configLocations = configLocations;
+        setConfigLocations(configLocations);
         refresh();
-    }
-
-    @Override
-    protected String[] getConfigLocations() {
-        return this.configLocations;
     }
 }

@@ -24,4 +24,6 @@ public interface ConfigurableApplicationContext extends ApplicationContext {
     void registerShutdownHook();
 
     void close();
+
+    void setParent(ApplicationContext parent);
 }

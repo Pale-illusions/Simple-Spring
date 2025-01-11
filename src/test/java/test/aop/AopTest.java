@@ -93,7 +93,7 @@ public class AopTest {
         WorldService worldService = new WorldServiceImpl();
 
         //Advisor是Pointcut和Advice的组合
-        String expression = "execution(* org.springframework.test.service.WorldService.explode(..))";
+        String expression = "execution(* test.aop.bean.WorldService.explode(..))";
         AspectJExpressionPointcutAdvisor advisor = new AspectJExpressionPointcutAdvisor();
         advisor.setExpression(expression);
         MethodBeforeAdviceInterceptor methodInterceptor = new MethodBeforeAdviceInterceptor(new WorldServiceBeforeAdvice());
