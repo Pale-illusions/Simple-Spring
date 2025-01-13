@@ -14,4 +14,9 @@ public class DemoServiceImpl implements DemoService {
         System.out.println("service 实现类中的name参数：" + name) ;
         return name;
     }
+
+    @Override
+    public String hello() {
+        return "hello, world";
+    }
 }

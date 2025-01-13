@@ -9,4 +9,6 @@ package test.webmvc.service;
 public interface DemoService {
 
     String get(String name);
+
+    String hello();
 }
