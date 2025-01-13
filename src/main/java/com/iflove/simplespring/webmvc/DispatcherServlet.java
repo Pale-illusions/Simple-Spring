@@ -345,7 +345,7 @@ public class DispatcherServlet extends FrameworkServlet {
                 // Load default strategy implementations from properties file.
                 // This is currently strictly internal and not meant to be customized
                 // by application developers.
-                ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, org.springframework.web.servlet.DispatcherServlet.class);
+                ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, DispatcherServlet.class);
                 defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
             }
             catch (IOException ex) {

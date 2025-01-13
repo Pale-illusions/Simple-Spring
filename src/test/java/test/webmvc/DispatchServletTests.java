@@ -1,6 +1,7 @@
 package test.webmvc;
 
 import com.iflove.simplespring.webmvc.DispatcherServlet;
+import com.iflove.simplespring.webmvc.HandlerMapping;
 import com.iflove.simplespring.webmvc.handler.AbstractHandlerMapping;
 import com.iflove.simplespring.webmvc.handler.HandlerMethod;
 import com.iflove.simplespring.webmvc.handler.RequestMappingHandlerMapping;
@@ -19,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
@@ -64,5 +66,11 @@ public class DispatchServletTests {
     }
 
 
+    @Test
+    public void initTest() {
+        // 观察 HandlerMappings HandlerAdapters handlerExceptionResolvers 是否成功初始化
+        System.out.println("init");
+        simpleDispatcherServlet.destroy();
+    }
 
 }
