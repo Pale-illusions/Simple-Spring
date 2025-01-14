@@ -1,5 +1,6 @@
 package com.iflove.simplespring.webmvc;
 
+import com.iflove.simplespring.webmvc.handler.HandlerMethod;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
@@ -49,9 +50,6 @@ public class DispatcherServlet extends FrameworkServlet {
     @Nullable
     private List<HandlerAdapter> handlerAdapters = new ArrayList<>();
 
-    /** HandlerExceptionResolvers 集合 */
-    @Nullable
-    private List<HandlerExceptionResolver> handlerExceptionResolvers = new ArrayList<>();
 
     /**
      * 与 DispatcherServlet 类相关的类路径资源的名称，用于定义 DispatcherServlet 的默认策略名称
@@ -73,12 +71,68 @@ public class DispatcherServlet extends FrameworkServlet {
     }
 
     protected void initStrategies(ApplicationContext context) {
-        // 初始化 请求url映射器
+        // 初始化文件上传解析器（MultipartResolver）
+        // 用于解析包含文件上传的 multipart 请求。Spring 提供了标准实现，如
+        // CommonsMultipartResolver（基于 Apache Commons FileUpload）和
+        // StandardServletMultipartResolver（基于 Servlet 3.0 标准）。
+        // 如果需要支持文件上传功能，则必须配置此解析器。
+        // initMultipartResolver(context);
+
+        // 初始化区域解析器（LocaleResolver）
+        // 用于解析请求的区域信息（Locale），以便在国际化应用中提供正确的语言和格式。
+        // 常见的实现包括 CookieLocaleResolver 和 SessionLocaleResolver，
+        // 它们分别基于 Cookie 或 Session 存储和解析区域信息。
+        // initLocaleResolver(context);
+
+        // 初始化主题解析器（ThemeResolver）
+        // 用于支持 Spring MVC 的主题功能。主题通常用来改变应用程序的视觉外观，比如 CSS 样式。
+        // 常见实现包括 FixedThemeResolver 和 CookieThemeResolver，
+        // 它们分别支持固定主题和基于 Cookie 的动态主题切换。
+        // initThemeResolver(context);
+
+        // 初始化请求 URL 映射器（HandlerMapping）
+        // 用于将请求 URL 映射到对应的处理器（Handler）。
+        // Spring MVC 提供了多种 HandlerMapping 实现，如
+        // - RequestMappingHandlerMapping：基于 @RequestMapping 注解的映射。
+        // - SimpleUrlHandlerMapping：基于 XML 或 Java 配置的静态映射。
+        // DispatcherServlet 会从 HandlerMapping 中找到与请求匹配的处理器。
         initHandlerMappings(context);
-        // 初始化 请求适配器
+
+        // 初始化请求适配器（HandlerAdapter）
+        // 用于将请求的处理委派给具体的处理器（Handler）。
+        // HandlerAdapter 通过多态支持不同类型的处理器，例如：
+        // - HttpRequestHandlerAdapter：支持实现 HttpRequestHandler 接口的处理器。
+        // - SimpleControllerHandlerAdapter：支持实现 Controller 接口的处理器。
+        // - RequestMappingHandlerAdapter：支持基于 @RequestMapping 的处理器方法。
+        // DispatcherServlet 会根据匹配的处理器选择适当的适配器执行请求。
         initHandlerAdapters(context);
-        // 初始化 异常处理器
-        initHandlerExceptionResolvers(context);
+
+        // 初始化异常处理器（HandlerExceptionResolver）
+        // 用于捕获和处理请求过程中抛出的异常。
+        // Spring MVC 提供默认实现，如：
+        // - ExceptionHandlerExceptionResolver：支持 @ExceptionHandler 注解。
+        // - ResponseStatusExceptionResolver：支持 @ResponseStatus 注解。
+        // - DefaultHandlerExceptionResolver：处理 Spring 内部标准异常。
+        // 如果没有匹配的异常处理器，异常将被容器默认的错误页面处理。
+        // initHandlerExceptionResolvers(context);
+
+        // 初始化请求到视图名称的转换器（RequestToViewNameTranslator）
+        // 用于在没有显式指定视图名称的情况下，从请求路径推断视图名称。
+        // 默认实现是 DefaultRequestToViewNameTranslator，它会从 URL 中提取路径作为视图名称。
+        // 例如：请求 `/user/profile` 会解析为视图名称 `user/profile`。
+        // initRequestToViewNameTranslator(context);
+
+        // 初始化视图解析器（ViewResolver）
+        // 用于将视图名称解析为具体的视图对象（View），比如 JSP、Thymeleaf 或 Freemarker。
+        // 常见的实现包括：InternalResourceViewResolver、ThymeleafViewResolver。
+        // DispatcherServlet 根据解析后的视图对象渲染响应。
+        // initViewResolvers(context);
+
+        // 初始化 Flash 属性管理器（FlashMapManager）
+        // 用于在请求重定向时，存储和传递临时属性（Flash 属性）。
+        // Spring 提供默认实现：DefaultFlashMapManager，基于 Session 存储 Flash 属性。
+        // Flash 属性通常用于传递一次性的用户反馈消息，例如表单提交后的成功提示。
+        // initFlashMapManager(context);
     }
 
     private void initHandlerMappings(ApplicationContext context) {
@@ -94,12 +148,14 @@ public class DispatcherServlet extends FrameworkServlet {
     }
 
     private void initHandlerAdapters(ApplicationContext context) {
-        // TODO		this.handlerAdapters = null;
-
-    }
-
-    private void initHandlerExceptionResolvers(ApplicationContext context) {
-        // TODO		this.handlerExceptionResolvers = null;
+        final Map<String, HandlerAdapter> map = BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerAdapter.class, true, false);
+        if (!ObjectUtils.isEmpty(map)) {
+            this.handlerAdapters = new ArrayList<>(map.values());
+        } else {
+            //没有则从默认配置文件中拿
+            this.handlerAdapters.addAll(getDefaultStrategies(context, HandlerAdapter.class));
+        }
+        this.handlerAdapters.sort(Comparator.comparingInt(Ordered::getOrder));
 
     }
 
@@ -176,118 +232,53 @@ public class DispatcherServlet extends FrameworkServlet {
      * <p>处理器将通过按顺序应用 servlet 的 HandlerMappings 来获取。
      * HandlerAdapter 将通过查询 servlet 安装的 HandlerAdapters 来找到第一个支持该处理器类的适配器。
      * <p>所有的 HTTP 方法都由该方法处理。具体哪些方法是可接受的，由 HandlerAdapters 或处理器本身决定
-     * @param request current HTTP request
-     * @param response current HTTP response
+     * @param req current HTTP request
+     * @param resp current HTTP response
      * @throws Exception in case of any kind of processing failure
      */
-    protected void doDispatch(HttpServletRequest request, HttpServletResponse response) throws Exception {
+    protected void doDispatch(HttpServletRequest req, HttpServletResponse resp) throws Exception {
 
+        Exception ex = null;
+        HandlerExecutionChain handlerExecutionChain = null;
+        try {
+            handlerExecutionChain = getHandler(req);
+            //handlerMethod找不到则返回404
+            if (ObjectUtils.isEmpty(handlerExecutionChain)) {
+                resp.sendError(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
 
-		HttpServletRequest processedRequest = request;
-        HandlerExecutionChain mappedHandler = null;
-//		HandlerExecutionChain mappedHandler = getHandler(processedRequest);
-//        HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
-//        ModelAndView mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
-//
-//        mappedHandler.applyPostHandle(processedRequest, response, mv);
-//        processDispatchResult(processedRequest, response,mappedHandler, mv);
+            handlerExecutionChain.afterCompletion(req, resp, handlerExecutionChain.getHandlerMethod(), ex);
 
-
-//		boolean multipartRequestParsed = false;
-//
-//		WebAsyncManager asyncManager = WebAsyncUtils.getAsyncManager(request);
-
-		try {
-			ModelAndView mv = null;
-			Exception dispatchException = null;
-
-			try {
-//				processedRequest = checkMultipart(request);
-//				multipartRequestParsed = (processedRequest != request);
-
-				// Determine handler for the current request.
-				mappedHandler = getHandler(processedRequest);
-				if (mappedHandler == null) {
-					noHandlerFound(processedRequest, response);
-					return;
-				}
-
-				// Determine handler adapter for the current request.
-				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
-
-				// Process last-modified header, if supported by the handler.
-//				String method = request.getMethod();
-//				boolean isGet = HttpMethod.GET.matches(method);
-//				if (isGet || HttpMethod.HEAD.matches(method)) {
-//					long lastModified = ha.getLastModified(request, mappedHandler.getHandler());
-//					if (new ServletWebRequest(request, response).checkNotModified(lastModified) && isGet) {
-//						return;
-//					}
-//				}
-
-
-                // TODO 拦截器
-//				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
-//					return;
-//				}
-
-				// Actually invoke the handler.
-				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
-
-//				if (asyncManager.isConcurrentHandlingStarted()) {
-//					return;
-//				}
-
-//				applyDefaultViewName(processedRequest, mv);
-
-                // TODO 拦截器
-//				mappedHandler.applyPostHandle(processedRequest, response, mv);
-			}
-			catch (Exception ex) {
-				dispatchException = ex;
-			}
-			catch (Throwable err) {
-				// As of 4.3, we're processing Errors thrown from handler methods as well,
-				// making them available for @ExceptionHandler methods and other scenarios.
-				dispatchException = new ServletException("Handler dispatch failed: " + err, err);
-			}
-			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
-		}
-		catch (Exception ex) {
-            throw new Exception(ex);
-//			triggerAfterCompletion(processedRequest, response, mappedHandler, ex);
-		}
-		catch (Throwable err) {
-
-//			triggerAfterCompletion(processedRequest, response, mappedHandler,
-//					new ServletException("Handler processing failed: " + err, err));
-		}
-//		finally {
-//			if (asyncManager.isConcurrentHandlingStarted()) {
-//				// Instead of postHandle and afterCompletion
-//				if (mappedHandler != null) {
-//					mappedHandler.applyAfterConcurrentHandlingStarted(processedRequest, response);
-//				}
-//				asyncManager.setMultipartRequestParsed(multipartRequestParsed);
-//			}
-//			else {
-//				// Clean up any resources used by a multipart request.
-//				if (multipartRequestParsed || asyncManager.isMultipartRequestParsed()) {
-//					cleanupMultipart(processedRequest);
-//				}
-//			}
-//		}
+            // 获得适配器
+            HandlerAdapter ha = getHandlerAdapter(handlerExecutionChain.getHandlerMethod());
+            if (!handlerExecutionChain.applyPreInterceptor(req, resp)) {
+                return;
+            }
+            ha.handle(req, resp, handlerExecutionChain.getHandlerMethod());
+            handlerExecutionChain.applyPostInterceptor(req, resp);
+        } catch (Exception e) {
+            ex = e;
+        }
+        try {
+            processDispatchResult(req, resp, handlerExecutionChain, ex);
+        } catch (Exception e) {
+            throw new ServletException(e.getMessage());
+        }
     }
 
-    private void processDispatchResult(HttpServletRequest processedRequest, HttpServletResponse response, HandlerExecutionChain mappedHandler, ModelAndView mv, Exception dispatchException) {
-        // TODO
-        PrintWriter writer = null;
-        try {
-            writer = response.getWriter();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    private void processDispatchResult(HttpServletRequest req, HttpServletResponse resp, HandlerExecutionChain chain, Exception ex) {
+        if (ex != null) {
+            // 简单的错误处理
+            PrintWriter writer = null;
+            try {
+                writer = resp.getWriter();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            writer.println("500 Internal Server Error");
+            ex.printStackTrace(writer);
         }
-        writer.println("Hello, world!");
     }
 
 
@@ -326,10 +317,10 @@ public class DispatcherServlet extends FrameworkServlet {
      * @param handler the handler object to find an adapter for
      * @throws ServletException if no HandlerAdapter can be found for the handler. This is a fatal error.
      */
-    protected HandlerAdapter getHandlerAdapter(Object handler) throws ServletException {
+    protected HandlerAdapter getHandlerAdapter(HandlerMethod handler) throws ServletException {
         if (this.handlerAdapters != null) {
             for (HandlerAdapter adapter : this.handlerAdapters) {
-                if (adapter.supports(handler)) {
+                if (adapter.support(handler)) {
                     return adapter;
                 }
             }
@@ -360,7 +351,7 @@ public class DispatcherServlet extends FrameworkServlet {
             List<T> strategies = new ArrayList<>(classNames.length);
             for (String className : classNames) {
                 try {
-                    Class<?> clazz = ClassUtils.forName(className, org.springframework.web.servlet.DispatcherServlet.class.getClassLoader());
+                    Class<?> clazz = ClassUtils.forName(className, DispatcherServlet.class.getClassLoader());
                     Object strategy = createDefaultStrategy(context, clazz);
                     strategies.add((T) strategy);
                 }

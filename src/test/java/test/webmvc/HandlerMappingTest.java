@@ -2,7 +2,7 @@ package test.webmvc;
 
 import com.iflove.simplespring.webmvc.DispatcherServlet;
 import com.iflove.simplespring.webmvc.HandlerExecutionChain;
-import com.iflove.simplespring.webmvc.annotation.RequestMetod;
+import com.iflove.simplespring.webmvc.annotation.RequestMethod;
 import com.iflove.simplespring.webmvc.handler.AbstractHandlerMapping;
 import com.iflove.simplespring.webmvc.handler.HandlerMethod;
 import com.iflove.simplespring.webmvc.handler.RequestMappingHandlerMapping;
@@ -16,7 +16,6 @@ import test.webmvc.controller.DemoController;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 
 /**
@@ -68,20 +67,20 @@ public class HandlerMappingTest {
         MockHttpServletRequest request = new MockHttpServletRequest(getServletContext(), "GET", "/demo/hello");
 
         handlerMethod.setPath(new TestMapping().initLookupPath(request));
-        handlerMethod.setRequestMethods(new RequestMetod[]{RequestMetod.GET});
+        handlerMethod.setRequestMethods(new RequestMethod[]{RequestMethod.GET});
 
         mapping.register(handlerMethod);
 
         HandlerExecutionChain chain = mapping.getHandler(request);
 
         System.out.println(chain);
-        System.out.println(chain.getHandler());
-        System.out.println(chain.getInterceptors());
+        System.out.println(chain.getHandlerMethod());
+        System.out.println(chain.getHandlerInterceptors());
     }
 
     class TestMapping extends AbstractHandlerMapping {
         @Override
-        protected Object getHandlerInternal(HttpServletRequest request) throws Exception {
+        protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
             return null;
         }
 

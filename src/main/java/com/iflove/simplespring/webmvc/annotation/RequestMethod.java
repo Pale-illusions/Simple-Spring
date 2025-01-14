@@ -6,7 +6,7 @@ package com.iflove.simplespring.webmvc.annotation;
  * @implNote 请求方法枚举
  */
 
-public enum RequestMetod {
+public enum RequestMethod {
 
     GET,POST,PUT,DELETE
 }

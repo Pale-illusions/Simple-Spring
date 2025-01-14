@@ -16,5 +16,5 @@ public @interface RequestMapping {
 
     String value() default "";
 
-    RequestMetod[] requestMethod() default {};
+    RequestMethod[] requestMethod() default {};
 }

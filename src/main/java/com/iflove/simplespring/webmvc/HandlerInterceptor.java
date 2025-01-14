@@ -1,28 +1,24 @@
 package com.iflove.simplespring.webmvc;
 
-import org.springframework.web.servlet.ModelAndView;
+
+import com.iflove.simplespring.webmvc.handler.HandlerMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * @author 苍镜月
- * @version 1.0
- * @implNote
+ * 拦截器顶层接口
  */
-
 public interface HandlerInterceptor {
 
-    default boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
-            throws Exception {
-        return true; // 默认放行
+    default boolean preHandle(HttpServletRequest request, HttpServletResponse response) {
+        return true;
     }
 
-    default void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-                            ModelAndView modelAndView) throws Exception {
+    default void postHandle(HttpServletRequest request, HttpServletResponse response) {
     }
 
-    default void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler,
-                                 Exception ex) throws Exception {
+    default void afterCompletion(HttpServletRequest request, HttpServletResponse response, HandlerMethod handler,
+                                 Exception ex) {
     }
 }

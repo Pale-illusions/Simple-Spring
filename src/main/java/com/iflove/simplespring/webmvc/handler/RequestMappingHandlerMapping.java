@@ -12,17 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.*;
 
-/**
- * @author 苍镜月
- * @version 1.0
- * @implNote
- */
+
 
 public class RequestMappingHandlerMapping extends AbstractHandlerMapping {
 
 
     @Override
-    protected Object getHandlerInternal(HttpServletRequest request) throws Exception {
+    protected HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception {
         String lookupPath = initLookupPath(request);
         return lookupHandlerMethod(lookupPath, request);
     }

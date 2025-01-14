@@ -1,6 +1,6 @@
 package com.iflove.simplespring.webmvc.handler;
 
-import com.iflove.simplespring.webmvc.annotation.RequestMetod;
+import com.iflove.simplespring.webmvc.annotation.RequestMethod;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.ObjectUtils;
 
@@ -25,9 +25,9 @@ public class HandlerMethod {
 
     protected String path;
 
-    protected RequestMetod[] requestMethods = new RequestMetod[0];
+    protected RequestMethod[] requestMethods;
 
-    protected MethodParameter[] parameters = new MethodParameter[0];
+    protected MethodParameter[] parameters;
 
     public HandlerMethod() {
     }
@@ -39,7 +39,7 @@ public class HandlerMethod {
         final Parameter[] parameters = method.getParameters();
         MethodParameter[] methodParameters = new MethodParameter[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
-            methodParameters[i] = new MethodParameter(method,i);
+            methodParameters[i] = new MethodParameter(method, i);
         }
         this.parameters = methodParameters;
     }
@@ -54,9 +54,9 @@ public class HandlerMethod {
 
 
     //如果为空则设置所有请求类型
-    public void setRequestMethods(RequestMetod[] requestMethods) {
-        if (ObjectUtils.isEmpty(requestMethods)){
-            requestMethods = RequestMetod.values();
+    public void setRequestMethods(RequestMethod[] requestMethods) {
+        if (ObjectUtils.isEmpty(requestMethods)) {
+            requestMethods = RequestMethod.values();
         }
         this.requestMethods = requestMethods;
     }
@@ -65,7 +65,7 @@ public class HandlerMethod {
         return parameters;
     }
 
-    public RequestMetod[] getRequestMethods() {
+    public RequestMethod[] getRequestMethods() {
         return requestMethods;
     }
 
@@ -79,8 +79,12 @@ public class HandlerMethod {
 
     @Override
     public boolean equals(Object object) {
-        if (this == object) {return true;}
-        if (object == null || getClass() != object.getClass()) {return false;}
+        if (this == object) {
+            return true;
+        }
+        if (object == null || getClass() != object.getClass()) {
+            return false;
+        }
         HandlerMethod that = (HandlerMethod) object;
         return Objects.equals(path, that.path) && Arrays.equals(requestMethods, that.requestMethods);
     }

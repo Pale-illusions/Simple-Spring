@@ -5,12 +5,11 @@ import com.iflove.simplespring.core.Ordered;
 import com.iflove.simplespring.webmvc.HandlerExecutionChain;
 import com.iflove.simplespring.webmvc.HandlerInterceptor;
 import com.iflove.simplespring.webmvc.HandlerMapping;
-import com.iflove.simplespring.webmvc.annotation.RequestMetod;
+import com.iflove.simplespring.webmvc.annotation.RequestMethod;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.server.RequestPath;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
 import org.springframework.web.servlet.DispatcherServlet;
 import org.springframework.web.util.ServletRequestPathUtils;
@@ -63,7 +62,7 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
     private HandlerMethod selectBestHandler(Set<HandlerMethod> candidates, HttpServletRequest request) {
         // 遍历候选处理器，根据条件（如请求方法）过滤并选择最佳匹配
         for (HandlerMethod handlerMethod : candidates) {
-            for (RequestMetod requestMethod : handlerMethod.getRequestMethods()) {
+            for (RequestMethod requestMethod : handlerMethod.getRequestMethods()) {
                 // 判断请求方法是否一致
                 if (requestMethod.name().equals(request.getMethod())) {
                     return handlerMethod;
@@ -100,14 +99,14 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
      */
     @Override
     public HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
-        Object handler = getHandlerInternal(request);
+        HandlerMethod handler = getHandlerInternal(request);
         if (handler == null) {
             return null;
         }
         return getHandlerExecutionChain(handler, request);
     }
 
-    protected abstract Object getHandlerInternal(HttpServletRequest request) throws Exception;
+    protected abstract HandlerMethod getHandlerInternal(HttpServletRequest request) throws Exception;
 
     /**
      * 获取处理器执行链
@@ -115,9 +114,9 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
      * @param request
      * @return
      */
-    protected HandlerExecutionChain getHandlerExecutionChain(Object handler, HttpServletRequest request) {
+    protected HandlerExecutionChain getHandlerExecutionChain(HandlerMethod handler, HttpServletRequest request) {
         HandlerExecutionChain chain = new HandlerExecutionChain(handler);
-        chain.getInterceptors().addAll(interceptors);
+        chain.setHandlerInterceptors(interceptors);
         return chain;
     }
 
