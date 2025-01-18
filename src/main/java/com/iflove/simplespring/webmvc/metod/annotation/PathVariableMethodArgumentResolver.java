@@ -1,11 +1,11 @@
 package com.iflove.simplespring.webmvc.metod.annotation;
 
+import com.iflove.simplespring.webmvc.annotation.PathVariable;
 import com.iflove.simplespring.webmvc.handler.HandlerMethod;
 import com.iflove.simplespring.webmvc.metod.support.HandlerMethodArgumentResolver;
 import com.iflove.simplespring.webmvc.support.WebServletRequest;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;

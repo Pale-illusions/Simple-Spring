@@ -1,6 +1,7 @@
 package com.iflove.simplespring.webmvc.adapter;
 
 import com.iflove.simplespring.webmvc.HandlerAdapter;
+import com.iflove.simplespring.webmvc.annotation.RequestMapping;
 import com.iflove.simplespring.webmvc.handler.HandlerMethod;
 import com.iflove.simplespring.webmvc.handler.ServletInvocableHandlerMethod;
 import com.iflove.simplespring.webmvc.metod.annotation.*;
@@ -12,7 +13,6 @@ import org.springframework.context.support.ApplicationObjectSupport;
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;

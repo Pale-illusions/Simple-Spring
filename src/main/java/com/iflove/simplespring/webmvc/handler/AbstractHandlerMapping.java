@@ -1,6 +1,5 @@
 package com.iflove.simplespring.webmvc.handler;
 
-import com.iflove.simplespring.beans.factory.InitializingBean;
 import com.iflove.simplespring.core.Ordered;
 import com.iflove.simplespring.webmvc.HandlerExecutionChain;
 import com.iflove.simplespring.webmvc.HandlerInterceptor;
@@ -8,16 +7,15 @@ import com.iflove.simplespring.webmvc.HandlerMapping;
 import com.iflove.simplespring.webmvc.annotation.RequestMethod;
 import com.iflove.simplespring.webmvc.intercpetor.MappedInterceptor;
 import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.server.RequestPath;
 import org.springframework.lang.Nullable;
 import org.springframework.web.context.support.WebApplicationObjectSupport;
-import org.springframework.web.servlet.DispatcherServlet;
-import org.springframework.web.util.ServletRequestPathUtils;
 import org.springframework.web.util.UrlPathHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author 苍镜月
@@ -55,7 +53,15 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
     @Nullable
     protected HandlerMethod lookupHandlerMethod(String lookupPath, HttpServletRequest request) throws Exception {
         // 查找匹配的处理器集合
-        Set<HandlerMethod> candidates = mappingRegistry.get(lookupPath);
+        // 因为可能存在模糊匹配，需要遍历
+        Set<HandlerMethod> candidates = new HashSet<>();
+        Set<String> paths = mappingRegistry.keySet();
+        for (String path : paths) {
+            if (Pattern.compile(path).matcher(lookupPath).matches()) {
+                candidates = mappingRegistry.get(path);
+                break;
+            }
+        }
         if (candidates == null || candidates.isEmpty()) {
             return null; // 没有匹配项
         }
@@ -132,18 +138,19 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
      */
     protected String initLookupPath(HttpServletRequest request) {
         request.removeAttribute(UrlPathHelper.PATH_ATTRIBUTE);
-        RequestPath requestPath = getRequestPath(request);
-        String lookupPath = requestPath.pathWithinApplication().value();
-        return UrlPathHelper.defaultInstance.removeSemicolonContent(lookupPath);
+        String requestPath = request.getRequestURI();
+//        String lookupPath = requestPath.pathWithinApplication().value();
+        return UrlPathHelper.defaultInstance.removeSemicolonContent(requestPath);
     }
 
-    private RequestPath getRequestPath(HttpServletRequest request) {
-        // Expect pre-parsed path with DispatcherServlet,
-        // but otherwise parse per handler lookup + cache for handling
-        return (request.getAttribute(DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE) != null ?
-                ServletRequestPathUtils.getParsedRequestPath(request) :
-                ServletRequestPathUtils.parseAndCache(request));
-    }
+    // FIXME: 报错
+//    private RequestPath getRequestPath(HttpServletRequest request) {
+//        // Expect pre-parsed path with DispatcherServlet,
+//        // but otherwise parse per handler lookup + cache for handling
+//        return (request.getAttribute(DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE) != null ?
+//                ServletRequestPathUtils.getParsedRequestPath(request) :
+//                ServletRequestPathUtils.parseAndCache(request));
+//    }
 
     public int getOrder() {
         return order;
