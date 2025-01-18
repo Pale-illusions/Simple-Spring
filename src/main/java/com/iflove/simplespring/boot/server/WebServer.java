@@ -4,9 +4,7 @@ import org.apache.catalina.LifecycleException;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 /**
- * @author 苍镜月
- * @version 1.0
- * @implNote
+ * @author Yusiheng
  */
 
 public interface WebServer {

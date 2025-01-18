@@ -256,8 +256,6 @@ public class DispatcherServlet extends FrameworkServlet {
                 return;
             }
 
-            handlerExecutionChain.afterCompletion(req, resp, handlerExecutionChain.getHandlerMethod(), ex);
-
             // 获得适配器
             HandlerAdapter ha = getHandlerAdapter(handlerExecutionChain.getHandlerMethod());
             if (!handlerExecutionChain.applyPreInterceptor(req, resp)) {
@@ -286,6 +284,10 @@ public class DispatcherServlet extends FrameworkServlet {
             }
             writer.println("500 Internal Server Error");
             ex.printStackTrace(writer);
+        }
+        // 请求处理完毕
+        if (chain != null) {
+            chain.afterCompletion(req, resp, chain.getHandlerMethod(), ex);
         }
     }
 

@@ -10,7 +10,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 /**
- * @author 苍镜月
+ * @author Yusiheng
  * @version 1.0
  * @implNote 内嵌 tomcat
  */

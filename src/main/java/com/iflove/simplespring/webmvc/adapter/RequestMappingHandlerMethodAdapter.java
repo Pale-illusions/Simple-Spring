@@ -84,7 +84,6 @@ public class RequestMappingHandlerMethodAdapter extends ApplicationObjectSupport
         final ArrayList<HandlerMethodReturnValueHandler> handlerMethodReturnValueHandlers = new ArrayList<>();
         handlerMethodReturnValueHandlers.add(new RequestResponseBodyMethodReturnValueHandler());
         return handlerMethodReturnValueHandlers;
-
     }
 
     /**

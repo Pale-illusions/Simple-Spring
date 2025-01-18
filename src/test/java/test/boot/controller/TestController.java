@@ -1,6 +1,7 @@
 package test.boot.controller;
 
 import com.iflove.simplespring.webmvc.annotation.*;
+import test.boot.domain.User;
 
 /**
  * @author 苍镜月
@@ -18,8 +19,8 @@ public class TestController {
         return "Hello, World";
     }
 
-    @GetMapping("/param/{id}")
-    public String param(@PathVariable("id") Integer id) {
+    @GetMapping("/path/{id}")
+    public String path(@PathVariable("id") Integer id) {
         System.out.println(id);
         System.out.println(id.getClass());
         return "这是一个 PathVariable -> " + id;
@@ -35,5 +36,17 @@ public class TestController {
             System.out.println(b);
             return "fail";
         }
+    }
+
+    @PostMapping("/post/user")
+    public User postUser(@RequestBody User user) {
+        return user;
+    }
+
+    @PostMapping("/header")
+    public String header(@RequestHeader String token, @RequestHeader Integer id) {
+        System.out.println(token);
+        System.out.println(id);
+        return "token: " + token + ", id: " + id;
     }
 }

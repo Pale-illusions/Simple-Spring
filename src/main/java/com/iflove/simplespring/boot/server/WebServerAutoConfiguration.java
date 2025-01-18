@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 /**
  * Web的自动配置类
+ * author: Yusiheng
  */
 
 @Configuration

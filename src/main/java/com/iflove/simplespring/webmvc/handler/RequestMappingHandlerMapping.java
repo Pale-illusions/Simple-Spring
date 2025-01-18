@@ -41,29 +41,14 @@ public class RequestMappingHandlerMapping extends AbstractHandlerMapping {
             path = value.equals("") ? "" : value;
         }
 
-        // 收集局部异常解析器
-//        Map<Class, ExceptionHandlerMethod> exceptionHandlerMethodMap = new HashMap<>();
         final Object bean = context.getBean(name);
 
-        // 收集局部类型转换器
-//        Map<Class, ConvertHandler> convertHandlerMap = new HashMap<>();
         for (Method method : methods) {
-            // 获取方法上存在ExceptionHandler注解的注解
-//            if (AnnotatedElementUtils.hasAnnotation(method, ExceptionHandler.class)){
-//                final ExceptionHandler exceptionHandler = AnnotatedElementUtils.findMergedAnnotation(method, ExceptionHandler.class);
-//                exceptionHandlerMethodMap.put(exceptionHandler.value(),new ExceptionHandlerMethod(bean,method));
-//            }
-//
-//            if (AnnotatedElementUtils.hasAnnotation(method, ConvertType.class)){
-//                final ConvertType convertType = AnnotatedElementUtils.findMergedAnnotation(method, ConvertType.class);
-//                convertHandlerMap.put(convertType.value(),new ConvertHandler(bean,method));
-//            }
             // 获取方法上是否存在RequestMapping注解
             if (AnnotatedElementUtils.hasAnnotation(method, RequestMapping.class)) {
                 // 收集
                 final HandlerMethod handlerMethod = new HandlerMethod(bean, method);
                 // 获得方法上的路径
-
                 final RequestMapping requestMapping = AnnotatedElementUtils.findMergedAnnotation(method, RequestMapping.class);
                 final String value = requestMapping.value();
                 String childPath = value.equals("") ? "" : value;
@@ -72,14 +57,11 @@ public class RequestMappingHandlerMapping extends AbstractHandlerMapping {
                 handlerMethod.setPath(path + childPath);
 
                 handlerMethods.add(handlerMethod);
-
             }
         }
         // 注册HandlerMethod
         if (!ObjectUtils.isEmpty(handlerMethods)) {
             for (HandlerMethod handlerMethod : handlerMethods) {
-//                handlerMethod.setExceptionHandlerMethodMap(exceptionHandlerMethodMap);
-//                handlerMethod.setConvertHandlerMap(convertHandlerMap);
                 register(handlerMethod);
             }
         }

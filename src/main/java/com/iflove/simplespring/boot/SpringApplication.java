@@ -9,9 +9,7 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import java.util.Map;
 
 /**
- * @author 苍镜月
- * @version 1.0
- * @implNote
+ * @author Yusiheng
  */
 
 public class SpringApplication {

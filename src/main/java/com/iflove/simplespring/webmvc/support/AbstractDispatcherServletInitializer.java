@@ -32,7 +32,7 @@ public abstract class AbstractDispatcherServletInitializer implements WebApplica
         rootApplicationContext.refresh();
         //创建子容器
         final WebApplicationContext webAppContext = createWebApplicationContext();
-        //创建DispatcherServlet，这里很关键我们可以在这里跟进
+        //创建DispatcherServlet
         DispatcherServlet dispatcherServlet = new DispatcherServlet(webAppContext);
         ServletRegistration.Dynamic dynamic = servletContext.addServlet(DEFAULT_SERVLET_NAME, dispatcherServlet);
         //配置文件
@@ -46,7 +46,6 @@ public abstract class AbstractDispatcherServletInitializer implements WebApplica
                 servletContext.addFilter(DEFAULT_FILTER_NAME, filter);
             }
         }
-
     }
 
     // 过滤器
