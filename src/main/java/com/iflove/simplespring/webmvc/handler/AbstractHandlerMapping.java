@@ -6,6 +6,7 @@ import com.iflove.simplespring.webmvc.HandlerExecutionChain;
 import com.iflove.simplespring.webmvc.HandlerInterceptor;
 import com.iflove.simplespring.webmvc.HandlerMapping;
 import com.iflove.simplespring.webmvc.annotation.RequestMethod;
+import com.iflove.simplespring.webmvc.intercpetor.MappedInterceptor;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.context.ApplicationContext;
 import org.springframework.http.server.RequestPath;
@@ -35,6 +36,10 @@ public abstract class AbstractHandlerMapping extends WebApplicationObjectSupport
 
     public void addInterceptor(HandlerInterceptor interceptor) {
         interceptors.add(interceptor);
+    }
+
+    public void addInterceptors(List<MappedInterceptor> interceptors) {
+        this.interceptors.addAll(interceptors);
     }
 
     public List<HandlerInterceptor> getInterceptors() {

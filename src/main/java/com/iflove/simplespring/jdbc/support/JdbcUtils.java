@@ -1,7 +1,7 @@
 package com.iflove.simplespring.jdbc.support;
 
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+//import com.sun.org.slf4j.internal.Logger;
+//import com.sun.org.slf4j.internal.LoggerFactory;
 
 import cn.hutool.core.util.StrUtil;
 import com.iflove.simplespring.utils.NumberUtils;
@@ -11,14 +11,14 @@ import java.sql.*;
 
 public class JdbcUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(JdbcUtils.class);
+//    private static final Logger logger = LoggerFactory.getLogger(JdbcUtils.class);
 
     public static void closeStatement(Statement stmt) {
         if (null != stmt) {
             try {
                 stmt.close();
             } catch (SQLException e) {
-                logger.trace("Could not close JDBC statement " + e);
+//                logger.trace("Could not close JDBC statement " + e);
             }
         }
     }
@@ -29,11 +29,11 @@ public class JdbcUtils {
                 rs.close();
             }
             catch (SQLException ex) {
-                logger.trace("Could not close JDBC ResultSet" + ex);
+//                logger.trace("Could not close JDBC ResultSet" + ex);
             }
             catch (Throwable ex) {
                 // We don't trust the JDBC driver: It might throw RuntimeException or Error.
-                logger.trace("Unexpected exception on closing JDBC ResultSet" + ex);
+//                logger.trace("Unexpected exception on closing JDBC ResultSet" + ex);
             }
         }
     }

@@ -5,15 +5,8 @@ import cn.hutool.log.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
-import org.springframework.context.i18n.LocaleContext;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-import org.springframework.web.context.request.async.WebAsyncManager;
-import org.springframework.web.context.request.async.WebAsyncUtils;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -21,7 +14,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,16 +26,24 @@ import java.util.Set;
 
 public abstract class FrameworkServlet extends HttpServletBean implements ApplicationContextAware {
 
-    /** hutool log */
+    /**
+     * hutool log
+     */
     protected final Log logger = LogFactory.get();
 
-    /** WebApplicationContext for this servlet. */
+    /**
+     * WebApplicationContext for this servlet.
+     */
     private WebApplicationContext webApplicationContext;
 
-    /** If the WebApplicationContext was injected via {@link #setApplicationContext}. */
+    /**
+     * If the WebApplicationContext was injected via {@link #setApplicationContext}.
+     */
     private boolean webApplicationContextInjected = false;
 
-    /** ServletContext attribute to find the WebApplicationContext in. */
+    /**
+     * ServletContext attribute to find the WebApplicationContext in.
+     */
     private String contextAttribute;
 
     /**
@@ -57,6 +57,14 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
      */
     private static final Set<String> HTTP_SERVLET_METHODS =
             new HashSet<>(Arrays.asList("DELETE", "HEAD", "GET", "OPTIONS", "POST", "PUT", "TRACE"));
+
+
+    public FrameworkServlet() {
+    }
+
+    public FrameworkServlet(WebApplicationContext webApplicationContext) {
+        this.webApplicationContext = webApplicationContext;
+    }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
@@ -83,6 +91,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
     /**
      * Initialize and publish the WebApplicationContext for this servlet.
+     *
      * @return the WebApplicationContext instance
      */
     protected WebApplicationContext initWebApplicationContext() {
@@ -134,6 +143,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
      * This method will be invoked after any bean properties have been set and
      * the WebApplicationContext has been loaded. The default implementation is empty;
      * subclasses may override this method to perform any initialization they require.
+     *
      * @throws ServletException in case of an initialization exception
      */
     protected void initFrameworkServlet() throws ServletException {
@@ -173,6 +183,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
      * Template method which can be overridden to add servlet-specific refresh work.
      * Called after successful context refresh.
      * <p>This implementation is empty.
+     *
      * @param context the current WebApplicationContext
      */
     protected void onRefresh(ApplicationContext context) {
@@ -182,6 +193,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
     /**
      * Close the WebApplicationContext of this servlet.
+     *
      * @see com.iflove.simplespring.context.ConfigurableApplicationContext#close()
      */
     @Override
@@ -196,10 +208,11 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
     /**
      * 拦截请求，根据请求类型判断去向
-     * @param request Http 请求
+     *
+     * @param request  Http 请求
      * @param response Http 响应
      * @throws ServletException ServletException
-     * @throws IOException IOException
+     * @throws IOException      IOException
      */
     @Override
     protected void service(HttpServletRequest request, HttpServletResponse response)
@@ -208,8 +221,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
         // 如果请求类型为 GET, POST, DELETE, PUT 等常见 Http 方法，走 super.service 处理
         if (HTTP_SERVLET_METHODS.contains(request.getMethod())) {
             super.service(request, response);
-        }
-        else {
+        } else {
             processRequest(request, response);
         }
     }
@@ -218,6 +230,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
      * Delegate GET requests to processRequest/doService.
      * <p>Will also be invoked by HttpServlet's default implementation of {@code doHead},
      * with a {@code NoBodyResponse} that just captures the content length.
+     *
      * @see #doHead
      */
     @Override
@@ -259,7 +272,8 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
     /**
      * 处理 Http 请求
-     * @param request Http 请求
+     *
+     * @param request  Http 请求
      * @param response Http 响应
      */
     protected final void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -283,11 +297,9 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
         try {
             doService(request, response);
-        }
-        catch (ServletException | IOException ex) {
+        } catch (ServletException | IOException ex) {
             throw ex;
-        }
-        catch (Throwable ex) {
+        } catch (Throwable ex) {
             throw new ServletException("Request processing failed: " + ex, ex);
         }
 
@@ -309,7 +321,8 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
      *
      * <p>该约定与 HttpServlet 中常被重写的 {@code doGet} 或 {@code doPost} 方法基本相同。
      * <p>此类拦截调用以确保异常处理和事件发布的发生。
-     * @param request current HTTP request
+     *
+     * @param request  current HTTP request
      * @param response current HTTP response
      * @throws Exception in case of any kind of processing failure
      * @see javax.servlet.http.HttpServlet#doGet

@@ -1,11 +1,13 @@
 package com.iflove.simplespring.boot.server;
 
 import com.iflove.simplespring.webmvc.DispatcherServlet;
-import org.apache.catalina.Context;
-import org.apache.catalina.LifecycleException;
+import org.apache.catalina.*;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
+import org.apache.catalina.core.StandardEngine;
+import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.startup.Tomcat;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 /**
  * @author 苍镜月
@@ -14,47 +16,41 @@ import org.apache.catalina.startup.Tomcat;
  */
 
 public class TomcatWebServer implements WebServer {
-    private Tomcat tomcat;
-    private String[] args;
-
-    public TomcatWebServer(String[] args) {
-       this.args = args;
-    }
 
     @Override
-    public void start() throws LifecycleException {
-        tomcat = new Tomcat();
-        tomcat.setPort(8080);
-        tomcat.start();
+    public void start(AnnotationConfigWebApplicationContext applicationContext) {
+        Tomcat tomcat = new Tomcat();
+        Server server = tomcat.getServer();
+        Service service = server.findService("Tomcat");
 
+        Connector connector = new Connector();
+        connector.setPort(8081);
+
+        Engine engine = new StandardEngine();
+        engine.setDefaultHost("localhost");
+
+        Host host = new StandardHost();
+        host.setName("localhost");
+
+        String contextPath = "";
         Context context = new StandardContext();
-        context.setPath("");
+        context.setPath(contextPath);
         context.addLifecycleListener(new Tomcat.FixContextListener());
 
-        DispatcherServlet servlet = new DispatcherServlet();
-        Tomcat.addServlet(context, "dispatcherServlet", servlet).setAsyncSupported(true);
-        context.addServletMappingDecoded("/", "dispatcherServlet");
+        host.addChild(context);
+        engine.addChild(host);
 
-        tomcat.getHost().addChild(context);
+        service.setContainer(engine);
+        service.addConnector(connector);
 
-        Thread awaitThread = new Thread("tomcat_await_thread") {
-            @Override
-            public void run() {
-                TomcatWebServer.this.tomcat.getServer().await();
-            }
-        };
-        awaitThread.setDaemon(false);
-        awaitThread.start();
-    }
+        //添加servlet用于处理请求
+        tomcat.addServlet(contextPath, "dispatcher", new DispatcherServlet(applicationContext));
+        context.addServletMappingDecoded("/*", "dispatcher");
 
-    @Override
-    public void stop() {
-
-    }
-
-    @Override
-    public int getPort() {
-        Connector connector = this.tomcat.getConnector();
-        return connector != null ? connector.getLocalPort() : -1;
+        try {
+            tomcat.start();
+        } catch (LifecycleException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

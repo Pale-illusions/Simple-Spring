@@ -3,8 +3,8 @@ package com.iflove.simplespring.jdbc.datasource;
 import com.iflove.simplespring.jdbc.CannotGetJdbcConnectionException;
 import com.iflove.simplespring.jdbc.support.JdbcUtils;
 import com.iflove.simplespring.tx.support.TransactionSynchronizationManager;
-import com.sun.org.slf4j.internal.Logger;
-import com.sun.org.slf4j.internal.LoggerFactory;
+//import com.sun.org.slf4j.internal.Logger;
+//import com.sun.org.slf4j.internal.LoggerFactory;
 
 import java.sql.SQLException;
 
@@ -14,7 +14,7 @@ import java.sql.SQLException;
 
 public abstract class DataSourceUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(JdbcUtils.class);
+//    private static final Logger logger = LoggerFactory.getLogger(JdbcUtils.class);
 
     public static Connection getConnection(DataSource dataSource) {
         try {
@@ -45,9 +45,9 @@ public abstract class DataSourceUtils {
         try {
             doReleaseConnection(con, dataSource);
         } catch (SQLException ex) {
-            logger.debug("Could not close JDBC Connection", ex);
+//            logger.debug("Could not close JDBC Connection", ex);
         } catch (Throwable ex) {
-            logger.debug("Unexpected exception on closing JDBC Connection", ex);
+//            logger.debug("Unexpected exception on closing JDBC Connection", ex);
         }
     }
 

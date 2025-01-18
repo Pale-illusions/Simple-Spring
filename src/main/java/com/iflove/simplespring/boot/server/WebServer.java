@@ -1,6 +1,7 @@
 package com.iflove.simplespring.boot.server;
 
 import org.apache.catalina.LifecycleException;
+import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 
 /**
  * @author 苍镜月
@@ -10,13 +11,6 @@ import org.apache.catalina.LifecycleException;
 
 public interface WebServer {
 
-    void start() throws LifecycleException;
+    void start(AnnotationConfigWebApplicationContext applicationContext);
 
-    void stop();
-
-    int getPort();
-
-    default void destroy() {
-        this.stop();
-    }
 }

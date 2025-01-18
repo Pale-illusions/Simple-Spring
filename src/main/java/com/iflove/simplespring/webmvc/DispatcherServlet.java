@@ -3,23 +3,15 @@ package com.iflove.simplespring.webmvc;
 import com.iflove.simplespring.webmvc.handler.HandlerMethod;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.BeanInitializationException;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.Ordered;
-import org.springframework.core.annotation.AnnotationAwareOrderComparator;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.lang.Nullable;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.context.request.ServletWebRequest;
-import org.springframework.web.context.request.async.WebAsyncManager;
-import org.springframework.web.context.request.async.WebAsyncUtils;
-import org.springframework.web.servlet.*;
-import org.springframework.web.util.WebUtils;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -42,11 +34,15 @@ public class DispatcherServlet extends FrameworkServlet {
 
     public static final String HANDLER_EXCEPTION_RESOLVER_BEAN_NAME = "handlerExceptionResolver";
 
-    /** HandlerMappings 集合 */
+    /**
+     * HandlerMappings 集合
+     */
     @Nullable
     private List<HandlerMapping> handlerMappings = new ArrayList<>();
 
-    /** HandlerAdapters 集合 */
+    /**
+     * HandlerAdapters 集合
+     */
     @Nullable
     private List<HandlerAdapter> handlerAdapters = new ArrayList<>();
 
@@ -61,8 +57,19 @@ public class DispatcherServlet extends FrameworkServlet {
 
     public static final String WEB_APPLICATION_CONTEXT_ATTRIBUTE = org.springframework.web.servlet.DispatcherServlet.class.getName() + ".CONTEXT";
 
+
+    public DispatcherServlet() {
+        super();
+    }
+
+
+    public DispatcherServlet(WebApplicationContext webApplicationContext) {
+        super(webApplicationContext);
+    }
+
     /**
      * mvc 初始化(核心方法)
+     *
      * @param context the current WebApplicationContext
      */
     @Override
@@ -232,7 +239,8 @@ public class DispatcherServlet extends FrameworkServlet {
      * <p>处理器将通过按顺序应用 servlet 的 HandlerMappings 来获取。
      * HandlerAdapter 将通过查询 servlet 安装的 HandlerAdapters 来找到第一个支持该处理器类的适配器。
      * <p>所有的 HTTP 方法都由该方法处理。具体哪些方法是可接受的，由 HandlerAdapters 或处理器本身决定
-     * @param req current HTTP request
+     *
+     * @param req  current HTTP request
      * @param resp current HTTP response
      * @throws Exception in case of any kind of processing failure
      */
@@ -285,6 +293,7 @@ public class DispatcherServlet extends FrameworkServlet {
     /**
      * Return the HandlerExecutionChain for this request.
      * <p>Tries all handler mappings in order.
+     *
      * @param request current HTTP request
      * @return the HandlerExecutionChain, or {@code null} if no handler could be found
      */
@@ -304,7 +313,8 @@ public class DispatcherServlet extends FrameworkServlet {
 
     /**
      * No handler found &rarr; set appropriate HTTP response status.
-     * @param request current HTTP request
+     *
+     * @param request  current HTTP request
      * @param response current HTTP response
      * @throws Exception if preparing the response failed
      */
@@ -314,6 +324,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
     /**
      * Return the HandlerAdapter for this handler object.
+     *
      * @param handler the handler object to find an adapter for
      * @throws ServletException if no HandlerAdapter can be found for the handler. This is a fatal error.
      */
@@ -338,8 +349,7 @@ public class DispatcherServlet extends FrameworkServlet {
                 // by application developers.
                 ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, DispatcherServlet.class);
                 defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
-            }
-            catch (IOException ex) {
+            } catch (IOException ex) {
                 throw new IllegalStateException("Could not load '" + DEFAULT_STRATEGIES_PATH + "': " + ex.getMessage());
             }
         }
@@ -354,21 +364,18 @@ public class DispatcherServlet extends FrameworkServlet {
                     Class<?> clazz = ClassUtils.forName(className, DispatcherServlet.class.getClassLoader());
                     Object strategy = createDefaultStrategy(context, clazz);
                     strategies.add((T) strategy);
-                }
-                catch (ClassNotFoundException ex) {
+                } catch (ClassNotFoundException ex) {
                     throw new BeanInitializationException(
                             "Could not find DispatcherServlet's default strategy class [" + className +
                                     "] for interface [" + key + "]", ex);
-                }
-                catch (LinkageError err) {
+                } catch (LinkageError err) {
                     throw new BeanInitializationException(
                             "Unresolvable class definition for DispatcherServlet's default strategy class [" +
                                     className + "] for interface [" + key + "]", err);
                 }
             }
             return strategies;
-        }
-        else {
+        } else {
             return Collections.emptyList();
         }
     }
