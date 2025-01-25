@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	         http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.springframework.org/schema/context">
+
+    <bean id="person" class="test.ioc.bean.Person">
+        <property name="name" value="苍镜月"/>
+        <property name="car" ref="car"/>
+    </bean>
+
+    <bean id="car" class="test.ioc.bean.Car">
+        <property name="brand" value="宝马"/>
+    </bean>
+
+    <bean class="test.ioc.processor.CustomBeanFactoryPostProcessor"/>
+
+    <bean class="test.ioc.processor.CustomBeanPostProcessor"/>
+
+    <bean id="helloService" class="test.ioc.bean.HelloService"/>
+
+</beans>
